@@ -1056,8 +1056,16 @@ workflow NALLO {
 
     emit:
     multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
-    versions       = ch_versions                 // channel: [ path(versions.yml) ]
-
+    multiqc_data        = MULTIQC.out.data
+    peddy_ped           = PEDDY.out.ped
+    peddy_sex_check_csv = PEDDY.out.sex_check_csv
+    peddy_ped_check_csv = PEDDY.out.ped_check_csv
+    bam_bai             = ch_bam_bai
+    haplotagged_bam_bai = PHASING.out.haplotagged_bam_bai
+    family_snv_vcf_tbi  =  BCFTOOLS_SORT.out.vcf.join(BCFTOOLS_SORT.out.tbi)
+    family_str_vcf_tbi  =  ANNOTATE_REPEAT_EXPANSIONS.out.vcf_idx
+    family_sv_vcf_tbi   = RANK_VARIANTS_SVS.out.vcf.join(RANK_VARIANTS_SVS.out.tbi)
+    versions            = ch_versions                                       // channel: [ path(versions.yml) ]
 }
 
 // Check if a family has a child with two parents,
