@@ -1065,6 +1065,7 @@ workflow NALLO {
     family_snv_vcf_tbi  = params.skip_rank_variants ? Channel.empty() :  BCFTOOLS_SORT.out.vcf.join(BCFTOOLS_SORT.out.tbi)
     family_str_vcf_tbi  = params.skip_repeat_annotation ? Channel.empty() : ANNOTATE_REPEAT_EXPANSIONS.out.vcf_idx
     family_sv_vcf_tbi   = params.skip_rank_variants ? Channel.empty() :  RANK_VARIANTS_SVS.out.vcf.join(RANK_VARIANTS_SVS.out.tbi)
+    per_base_d4         = params.skip_qc ? Channel.empty() : QC_ALIGNED_READS.out.per_base_d4
     versions            = ch_versions                                       // channel: [ path(versions.yml) ]
 }
 
