@@ -1065,6 +1065,7 @@ workflow NALLO {
     peddy_ped           = params.skip_peddy ? Channel.empty() : PEDDY.out.ped
     peddy_sex_check_csv = params.skip_peddy ? Channel.empty() : PEDDY.out.sex_check_csv
     peddy_ped_check_csv = params.skip_peddy ? Channel.empty() : PEDDY.out.ped_check_csv
+    cramino_stats       = params.skip_qc ? Channel.empty() : QC_ALIGNED_READS.out.cramino_stats
     multiqc_data        = MULTIQC.out.data
     multiqc_report      = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
     versions            = ch_versions                                       // channel: [ path(versions.yml) ]

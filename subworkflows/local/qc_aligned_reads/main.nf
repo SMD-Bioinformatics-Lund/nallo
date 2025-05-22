@@ -52,5 +52,6 @@ workflow QC_ALIGNED_READS {
     mosdepth_region_dist = MOSDEPTH.out.regions_txt // channel: [ val(meta), path(txt) ]
     mosdepth_per_base_d4 = MOSDEPTH.out.per_base_d4 // channel: [ val(meta), path(d4)  ]
     sambamba_depth_bed   = ch_sambamba_depth_bed    // channel: [ val(meta), path(bed) ]
+    cramino_stats        = CRAMINO.out.stats        // channel: [ val(meta), path(txt) ]
     versions             = ch_versions              // channel: [ versions.yml ]
 }
