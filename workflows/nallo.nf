@@ -1060,7 +1060,7 @@ workflow NALLO {
     haplotagged_bam_bai = params.skip_phasing ? Channel.empty() : PHASING.out.haplotagged_bam_bai
     family_snv_vcf      = params.skip_rank_variants ? Channel.empty() :  BCFTOOLS_SORT.out.vcf
     family_sv_vcf_tbi   = params.skip_rank_variants ? Channel.empty() :  RANK_VARIANTS_SVS.out.vcf.join(RANK_VARIANTS_SVS.out.tbi)
-    family_str_vcf_tbi  = params.skip_repeat_annotation ? Channel.empty() : !params.skip_repeat_calling ? ANNOTATE_REPEAT_EXPANSIONS.out.vcf_idx : Channel.empty()
+    family_str_vcf_tbi  = params.skip_repeat_annotation ? Channel.empty() : !params.skip_repeat_calling ? STRANGER.out.vcf : Channel.empty()
     per_base_d4         = params.skip_qc ? Channel.empty() : QC_ALIGNED_READS.out.mosdepth_per_base_d4
     peddy_ped           = params.skip_peddy ? Channel.empty() : PEDDY.out.ped
     peddy_sex_check_csv = params.skip_peddy ? Channel.empty() : PEDDY.out.sex_check_csv
