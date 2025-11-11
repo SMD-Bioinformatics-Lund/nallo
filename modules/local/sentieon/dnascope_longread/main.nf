@@ -36,10 +36,6 @@ process DNASCOPE_LONGREAD_CALL_SNVS {
        diploid_intersect_cmd = "bedtools intersect -a ${interval_bed} -b ${female_diploid_bed} > diploid_regions.bed"
    }
 
-   def default_bed_arg = "--bed ${interval_bed}"
-   def haploid_bed_arg = haploid_intersect_cmd ? "--haploid_bed haploid_regions.bed" : ""
-   def diploid_bed_arg = diploid_intersect_cmd ? "--bed diploid_regions.bed" : default_bed_arg
-
    """
    ${haploid_intersect_cmd}
    ${diploid_intersect_cmd}
@@ -50,8 +46,8 @@ process DNASCOPE_LONGREAD_CALL_SNVS {
         -r ${fasta} \\
         -i ${bam} \\
         -m ${model_bundle} \\
-        ${diploid_bed_arg} \\
-        ${haploid_bed_arg} \\
+        ${diploid_intersect_cmd ? '--bed diploid_regions.bed' : "--bed ${interval_bed}"} \\
+        ${haploid_intersect_cmd ? '--haploid_bed haploid_regions.bed' : ''} \\
         --gvcf \\
         --skip_mosdepth \\
         --skip_cnv \\
