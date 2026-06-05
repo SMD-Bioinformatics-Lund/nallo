@@ -1312,14 +1312,6 @@
 <td>True</td>
 </tr>
 <tr>
-<td><code>hook_url</code></td>
-<td>Incoming hook URL for messaging service <details><summary>Help</summary><small>Incoming hook URL for messaging service. Currently, MS Teams and Slack are supported.</small></details></td>
-<td><code>string</code></td>
-<td></td>
-<td></td>
-<td>True</td>
-</tr>
-<tr>
 <td><code>multiqc_config</code></td>
 <td>Custom config file to supply to MultiQC.</td>
 <td><code>string</code></td>
@@ -1355,7 +1347,7 @@
 <td><code>pipelines_testdata_base_path</code></td>
 <td>Base URL or local path to location of pipeline test dataset files</td>
 <td><code>string</code></td>
-<td>https://raw.githubusercontent.com/genomic-medicine-sweden/test-datasets/59c411038dac1e4dab2d745c80d382f047433539/</td>
+<td>https://raw.githubusercontent.com/genomic-medicine-sweden/test-datasets/18b1ccc26292fa502be235a918bdc4e61c1ecb8a/</td>
 <td></td>
 <td>True</td>
 </tr>
@@ -1500,6 +1492,14 @@
 <td>Which phasing software to use (<code>longphase</code>, <code>whatshap</code>, <code>hiphase</code>) (accepted: <code>longphase</code>|<code>whatshap</code>|<code>hiphase</code>)</td>
 <td><code>string</code></td>
 <td>longphase</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>whatshap_pedigree_phasing</code></td>
+<td>Enable/disable pedigree phasing when phasing with whatshap</td>
+<td><code>boolean</code></td>
+<td>True</td>
 <td></td>
 <td></td>
 </tr>
