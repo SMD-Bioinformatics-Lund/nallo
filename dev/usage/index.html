@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -1568,7 +1568,7 @@ NB: The order of profiles is important! They are loaded in sequence, so later pr
 </ol>
 <h3 id="samplesheet">Samplesheet</h3>
 <p>First, you will need to create a samplesheet with information about the samples you would like to analyze before running the pipeline. Use this parameter to specify its location.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>--input<span class="w"> </span><span class="s1">&#39;[path to samplesheet file]&#39;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>--input<span class="w"> </span><span class="s1">'[path to samplesheet file]'</span>
 </span></code></pre></div>
 <p>It has to be a comma-separated file with seven columns and a header row, as shown in the example below:</p>
 <div class="language-console highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="go">project,sample,file,family_id,paternal_id,maternal_id,sex,phenotype</span>
@@ -1623,13 +1623,23 @@ NB: The order of profiles is important! They are loaded in sequence, so later pr
 <p>If you have multiple files per sample, they can be added on separate rows. Keep all columns except <code>file</code> identical for each sample. The files will be merged after alignment or before assembly.</p>
 </div>
 <h3 id="presets">Presets</h3>
-<p>This pipeline comes with three different presets that should be set with the <code>--preset</code> parameter: <code>revio</code> (default), <code>pacbio</code> or <code>ONT_R10</code>. The preset parameter controls certain technology specific tools and parameters.</p>
+<p>This pipeline comes with four different presets that should be set with the <code>--preset</code> parameter: <code>revio</code> (default), <code>pacbio</code>, <code>ONT_R10</code> or <code>ONT_R10_AS</code>. The preset parameter controls certain technology specific tools and parameters.</p>
 <div class="admonition info">
 <p class="admonition-title">Preset effects on subworkflows</p>
 <ul>
-<li><code>--skip_repeat_annotation</code> will be set to <code>true</code> for <code>ONT_R10</code></li>
-<li><code>--skip_call_paralogs</code> will be set to <code>true</code> for <code>ONT_R10</code></li>
+<li><code>--skip_repeat_annotation</code> will be set to <code>true</code> for <code>ONT_R10</code> and <code>ONT_R10_AS</code></li>
+<li><code>--skip_call_paralogs</code> will be set to <code>true</code> for <code>ONT_R10</code> and <code>ONT_R10_AS</code></li>
 <li><code>--skip_methylation_calling</code> will be set to <code>true</code> for <code>pacbio</code></li>
+<li><code>--skip_mitochondrial_calling</code> will be set to <code>true</code> for <code>ONT_R10_AS</code></li>
+</ul>
+</div>
+<div class="admonition info">
+<p class="admonition-title">ONT_R10_AS — adaptive sampling preset</p>
+<p><code>ONT_R10_AS</code> is intended for Oxford Nanopore adaptive sampling runs. In adaptive sampling, the sequencer selectively enriches reads from target regions in real time; rejected off-target reads are still output and will map across the genome. The preset inherits all <code>ONT_R10</code> settings and adds targeted-run behaviour on top.</p>
+<p>Provide the BED file of enriched regions with <code>--target_regions</code>. This single parameter automatically sets all region-related parameters (<code>--mosdepth_regions</code>, <code>--modkit_include_bed</code>, <code>--snv_call_regions</code>, <code>--sv_call_regions</code>). The pipeline will then:</p>
+<ul>
+<li>Filter aligned reads to on-target regions before cramino QC, so yield and N50 reflect enriched reads only</li>
+<li>Run mosdepth with per-region depth and coverage thresholds (≥20X, ≥30X) for each target region</li>
 </ul>
 </div>
 <h3 id="reference-files">Reference files</h3>
@@ -1673,6 +1683,10 @@ NB: The order of profiles is important! They are loaded in sequence, so later pr
 </tbody>
 </table>
 <p>Turned off with <code>--skip_alignment</code>.</p>
+<div class="admonition info">
+<p class="admonition-title">Using pbmm2 with fastq files</p>
+<p>pbmm2 can be used to align the reads to the reference. If you are running the pipeline with fastq files as input, they will be converted to bam files for the analysis, and a <code>DS:READTYPE=CCS</code> tag will be added to the header. Without this tag, pbmm2 will not be able to run successfully. This tag is only added under these conditions (pbmm2 as aligner and fastq as input).</p>
+</div>
 <h4 id="sex-check">Sex check</h4>
 <p>Some subworkflows are sex-dependent and need a sex-inference step if samples are input with unknown sex. This step requires <code>--somalier_sites</code>.</p>
 <table>
@@ -1884,7 +1898,7 @@ The phaser can be chosen using the <code>--phaser</code> argument. See the follo
 <p>Turned off with <code>--skip_phasing</code>.</p>
 <h4 id="methylation-calling">Methylation calling</h4>
 <p>This subworkflow relies on alignment and short variant calling subworkflows, but requires no additional files. By default, modkit is run when <code>--preset ONT_R10</code> is active, while methbat is run when <code>--preset revio</code> is active.</p>
-<p>If MethBat is used, it requires the following file:</p>
+<p>If MethBat is used, the following files are required:</p>
 <table>
 <thead>
 <tr>
@@ -1896,6 +1910,10 @@ The phaser can be chosen using the <code>--phaser</code> argument. See the follo
 <tr>
 <td><code>methbat_regions</code></td>
 <td>A tsv file with only regions of interest (<a href="https://github.com/PacificBiosciences/MethBat/blob/main/data/cpgIslandExt.sorted.hg38.tsv">example</a>), or with both regions and background cohort values (<a href="https://github.com/PacificBiosciences/MethBat/blob/main/data/meth_profile_model.tsv">example</a>), made with methbat build</td>
+</tr>
+<tr>
+<td><code>methbat_map</code></td>
+<td>A tsv file mapping genomic regions to HGNC gene names and region types (e.g. imprinted regions, promoters), used to annotate methbat output. Required when <code>--skip_methylation_annotation</code> is not set.</td>
 </tr>
 </tbody>
 </table>
@@ -2056,6 +2074,10 @@ The phaser can be chosen using the <code>--phaser</code> argument. See the follo
 <td><strong>Optional</strong>: A CSV/TSV/JSON/YAML file with annotation databases from <a href="https://github.com/brentp/echtvar">echtvar encode</a> (e.g. <a href="https://surfdrive.surf.nl/files/index.php/s/LddbAYQAYPqtYu6/download"><code>gnomad.v3.1.2.echtvar.popmax.v2.zip</code></a>)</td>
 </tr>
 <tr>
+<td><code>extra_vep_options_snv</code></td>
+<td><strong>Optional</strong>: Options appended to the VEP core command for SNV annotation, applied to both nuclear and mitochondrial SNVs. Defaults to standard enrichment annotations. To add plugins (e.g. CADD, SpliceAI), supply the default flags plus your additions (e.g. <code>'--buffer_size 20000 ... --plugin CADD,snv.tsv.gz'</code>). Plugin files must be included in <code>vep_plugin_files</code>.</td>
+</tr>
+<tr>
 <td><code>variant_consequences_snvs</code></td>
 <td>A list of SO terms listed in the order of severity from most severe to lease severe for annotating genomic and mitochondrial SNVs. Sample file <a href="https://github.com/nf-core/test-datasets/blob/raredisease/reference/variant_consequences_v2.txt">here</a>. You can learn more about these terms <a href="https://ensembl.org/info/genome/variation/prediction/predicted_data.html">here</a></td>
 </tr>
@@ -2081,7 +2103,7 @@ The phaser can be chosen using the <code>--phaser</code> argument. See the follo
 <p>Turned off with <code>--skip_snv_annotation</code>.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>If variants are annotated with allele frequecies, these can be used in the <code>chromograph</code> subworkflow to generate plots with regions of autozygosity from <a href="https://github.com/Clinical-Genomics/chromograph">chromograph</a>. By default only coverage plots are generated, since the pipeline doesn't require annotation with allele frequencies. Annotate variants with allele frequencies (e.g. from gnomAD), and set the tag using <code>--chromograph_af_tag</code>.</p>
+<p>If variants are annotated with allele frequencies, these can be used in the <code>chromograph</code> subworkflow to generate plots with regions of autozygosity from <a href="https://github.com/Clinical-Genomics/chromograph">chromograph</a>. By default only coverage plots are generated, since the pipeline doesn't require annotation with allele frequencies. Annotate variants with allele frequencies (e.g. from gnomAD), and set the tag using <code>--chromograph_af_tag</code>. If <code>echtvar</code> annotation is skipped, the unannotated vcfs can be used as input to <code>chromograph</code>.</p>
 </div>
 <h4 id="rank-snvs-and-indels">Rank SNVs and INDELs</h4>
 <p>This subworkflow ranks SNVs, and relies on the alignment, SNV calling and SNV annotation subworkflows. It requires the following additional files:</p>
@@ -2126,6 +2148,10 @@ The phaser can be chosen using the <code>--phaser</code> argument. See the follo
 <tr>
 <td><code>vep_plugin_files</code> <sup>2</sup></td>
 <td>A CSV/TSV/JSON/YAML file with VEP plugin files, pLI and LoFtool are required. Example provided below.</td>
+</tr>
+<tr>
+<td><code>extra_vep_options_sv</code></td>
+<td><strong>Optional</strong>: Options appended to the VEP core command for SV annotation. Defaults to standard enrichment annotations. To add plugins, supply the default flags plus your additions (e.g. <code>'--appris --biotype ... --plugin CADD,sv.tsv.gz'</code>). Plugin files must be included in <code>vep_plugin_files</code>.</td>
 </tr>
 <tr>
 <td><code>variant_consequences_svs</code></td>
@@ -2292,7 +2318,7 @@ Some HPC setups also allow you to run nextflow within a cluster job submitted yo
 <h2 id="nextflow-memory-requirements">Nextflow memory requirements</h2>
 <p>In some cases, the Nextflow Java virtual machines can start to request a large amount of memory.
 We recommend adding the following line to your environment to limit this (typically in <code>~/.bashrc</code> or <code>~./bash_profile</code>):</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">NXF_OPTS</span><span class="o">=</span><span class="s1">&#39;-Xms1g -Xmx4g&#39;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">NXF_OPTS</span><span class="o">=</span><span class="s1">'-Xms1g -Xmx4g'</span>
 </span></code></pre></div>
 <h2 id="running-the-pipeline-without-internet-access">Running the pipeline without internet access</h2>
 <h3 id="download-pipeline-and-containers">Download pipeline and containers</h3>
@@ -2398,7 +2424,7 @@ We recommend adding the following line to your environment to limit this (typica
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "content.code.copy", "navigation.instant", "navigation.top", "navigation.tracking", "navigation.sections", "navigation.footer", "search.share", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

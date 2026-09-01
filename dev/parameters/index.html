@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -27,7 +27,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -760,8 +760,24 @@
 <td></td>
 </tr>
 <tr>
+<td><code>skip_mitochondrial_calling</code></td>
+<td>Skip mitochondrial variant calling</td>
+<td><code>boolean</code></td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
 <td><code>skip_sex_check</code></td>
 <td>Skip sex check</td>
+<td><code>boolean</code></td>
+<td>False</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>skip_portello</code></td>
+<td>Skip Portello analysis</td>
 <td><code>boolean</code></td>
 <td>False</td>
 <td></td>
@@ -812,6 +828,14 @@
 <td>MultiQC report title. Printed as page header, used for filename if not otherwise specified.</td>
 <td><code>string</code></td>
 <td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>premapped</code></td>
+<td>Whether the input data is already mapped to the reference genome</td>
+<td><code>boolean</code></td>
+<td>False</td>
 <td></td>
 <td></td>
 </tr>
@@ -914,6 +938,14 @@
 <tr>
 <td><code>methbat_regions</code></td>
 <td>A tsv file with only regions of interest (example here: https://github.com/PacificBiosciences/MethBat/blob/main/data/cpgIslandExt.sorted.hg38.tsv) or with both regions and background cohort values (example here: https://github.com/PacificBiosciences/MethBat/blob/main/data/meth_profile_model.tsv), made with methbat build</td>
+<td><code>string</code></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>cramino_regions</code></td>
+<td>A BED file used to filter reads to on-target regions before cramino QC. By default this is the same as <code>target_regions</code>.</td>
 <td><code>string</code></td>
 <td></td>
 <td></td>
@@ -1347,7 +1379,7 @@
 <td><code>pipelines_testdata_base_path</code></td>
 <td>Base URL or local path to location of pipeline test dataset files</td>
 <td><code>string</code></td>
-<td>https://raw.githubusercontent.com/genomic-medicine-sweden/test-datasets/18b1ccc26292fa502be235a918bdc4e61c1ecb8a/</td>
+<td>https://raw.githubusercontent.com/genomic-medicine-sweden/test-datasets/1e84555134bb9638ad0dde49afd895e3192de3f0/</td>
 <td></td>
 <td>True</td>
 </tr>
@@ -1417,7 +1449,7 @@
 </tr>
 <tr>
 <td><code>preset</code></td>
-<td>Enable or disable certain parts of the pipeline by default, depending on data type (<code>revio</code>, <code>pacbio</code>, <code>ONT_R10</code>) (accepted: <code>revio</code>|<code>pacbio</code>|<code>ONT_R10</code>)</td>
+<td>Enable or disable certain parts of the pipeline by default, depending on data type (<code>revio</code>, <code>pacbio</code>, <code>ONT_R10</code>, <code>ONT_R10_AS</code>) (accepted: <code>revio</code>|<code>pacbio</code>|<code>ONT_R10</code>|<code>ONT_R10_AS</code>)</td>
 <td><code>string</code></td>
 <td>revio</td>
 <td>True</td>
@@ -1520,18 +1552,10 @@
 <td></td>
 </tr>
 <tr>
-<td><code>run_methbat</code></td>
-<td>Run methbat for methylation analysis, set to <code>true</code> by default when <code>--preset revio</code> is active.</td>
-<td><code>boolean</code></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td><code>run_modkit</code></td>
-<td>Run modkit for methylation analysis, set to <code>true</code> by default when <code>--preset ONT_R10</code> is active.</td>
-<td><code>boolean</code></td>
-<td></td>
+<td><code>methylation_callers</code></td>
+<td>Which methylation callers to use. Several callers can be specified, separated by commas (e.g. methbat,modkit). Defaults to <code>methbat</code> when <code>--preset revio</code> is active and <code>modkit</code> when <code>--preset ONT_R10</code> is active.</td>
+<td><code>string</code></td>
+<td>methbat</td>
 <td></td>
 <td></td>
 </tr>
@@ -1633,7 +1657,7 @@
 </tr>
 <tr>
 <td><code>vep_plugin_files</code></td>
-<td>Path to a CSV/TSV/JSON/YAML file with vep_files as header, and then paths to vep plugin files. Paths to pLI_values.txt and LoFtool_scores.txt are required.</td>
+<td>Path to a CSV/TSV/JSON/YAML file with vep_files as header, and then paths to vep plugin files. Paths to pLI_values.txt and LoFtool_scores.txt are required for SNV annotation; only pLI_values.txt is required for SV annotation.</td>
 <td><code>string</code></td>
 <td></td>
 <td></td>
@@ -1728,12 +1752,20 @@
 <td>True</td>
 </tr>
 <tr>
-<td><code>extra_vep_options</code></td>
-<td>Extra options to VEP, used for test profile.</td>
+<td><code>extra_vep_options_snv</code></td>
+<td>Options appended to the VEP core command for SNV annotation (applied to both nuclear and mitochondrial SNVs). The default enables standard enrichment annotations. To add plugins such as CADD or SpliceAI, supply the default flags plus your additions. Plugin files must be included in <code>vep_plugin_files</code>.</td>
 <td><code>string</code></td>
+<td>--buffer_size 20000 --appris --biotype --canonical --ccds --domains --exclude_predicted --force_overwrite --hgvs --humdiv --no_progress --numbers --polyphen p --protein --regulatory --sift p --symbol --tsl --uniprot --no_stats</td>
 <td></td>
 <td></td>
-<td>True</td>
+</tr>
+<tr>
+<td><code>extra_vep_options_sv</code></td>
+<td>Options appended to the VEP core command for SV annotation. The default enables standard enrichment annotations. To add plugins, supply the default flags plus your additions. Plugin files must be included in <code>vep_plugin_files</code>.</td>
+<td><code>string</code></td>
+<td>--appris --biotype --buffer_size 100 --canonical --ccds --domains --exclude_predicted --force_overwrite --hgvs --no_progress --numbers --protein --regulatory --symbol --tsl --uniprot --no_stats</td>
+<td></td>
+<td></td>
 </tr>
 <tr>
 <td><code>extra_yak_options</code></td>
@@ -2007,6 +2039,46 @@
 <td></td>
 <td></td>
 </tr>
+<tr>
+<td><code>read_aligner</code></td>
+<td>Which aligner to use for read alignment. Supported arguments are mm2plus, minimap2 or pbmm2. (accepted: <code>minimap2</code>|<code>pbmm2</code>|<code>mm2plus</code>)</td>
+<td><code>string</code></td>
+<td>pbmm2</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>pbmm2_preset</code></td>
+<td>Preset to use for pbmm2. Supported arguments are HIFI, CCS, or SUBREAD. (accepted: <code>HIFI</code>|<code>CCS</code>|<code>SUBREAD</code>)</td>
+<td><code>string</code></td>
+<td>CCS</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>glnexus_config</code></td>
+<td>Glnexus config to use for merging gVCFs. If no file is provided, the default config <code>assets/glnexus_config_dp1.yml</code> will be used.</td>
+<td><code>string</code></td>
+<td>None</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>assembly_aligner</code></td>
+<td>Which aligner to use for assembly alignment. Supported arguments are mm2plus or minimap2. (accepted: <code>mm2plus</code>|<code>minimap2</code>)</td>
+<td><code>string</code></td>
+<td>minimap2</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>methbat_map</code></td>
+<td>Mapping file that can be used to filter and annotate the methbat output based on regions.</td>
+<td><code>string</code></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
 </tbody>
 </table>
 
@@ -2091,7 +2163,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "content.code.copy", "navigation.instant", "navigation.top", "navigation.tracking", "navigation.sections", "navigation.footer", "search.share", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
