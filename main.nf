@@ -32,6 +32,7 @@ NAMED WORKFLOWS FOR PIPELINE
 //
 workflow GENOMICMEDICINESWEDEN_NALLO {
     take:
+    ch_annotsv_annotations
     ch_cadd_header
     ch_cadd_prescored_indels
     ch_cadd_resources
@@ -82,6 +83,7 @@ workflow GENOMICMEDICINESWEDEN_NALLO {
     ch_vep_cache_unprocessed
     ch_vep_plugin_files
     val_alignment_processes
+    val_annotate_annotsv
     val_assembly_aligner
     val_bigwig_modcodes
     val_cram_output
@@ -155,6 +157,7 @@ workflow GENOMICMEDICINESWEDEN_NALLO {
     // WORKFLOW: Run pipeline
     //
     NALLO(
+        ch_annotsv_annotations,
         ch_cadd_header,
         ch_cadd_prescored_indels,
         ch_cadd_resources,
@@ -205,6 +208,7 @@ workflow GENOMICMEDICINESWEDEN_NALLO {
         ch_vep_cache_unprocessed,
         ch_vep_plugin_files,
         val_alignment_processes,
+        val_annotate_annotsv,
         val_assembly_aligner,
         val_bigwig_modcodes,
         val_skip_phasing && val_cram_output,
@@ -393,6 +397,7 @@ workflow GENOMICMEDICINESWEDEN_NALLO {
     somalier_relate_html                = NALLO.out.somalier_relate_html                // channel: [ val(meta), path(html) ]
     somalier_relate_pairs               = NALLO.out.somalier_relate_pairs               // channel: [ val(meta), path(pairs.tsv) ]
     somalier_relate_samples             = NALLO.out.somalier_relate_samples             // channel: [ val(meta), path(samples.tsv) ]
+    annotsv_tsv                        = NALLO.out.annotsv_tsv                        // channel: [ val(meta), path(tsv) ]
     svs_per_family_and_caller_tbi       = NALLO.out.svs_per_family_and_caller_tbi       // channel: [ val(meta), path(tbi) ]
     svs_per_family_and_caller_vcf       = NALLO.out.svs_per_family_and_caller_vcf       // channel: [ val(meta), path(vcf) ]
     svs_per_family_merged_tbi           = NALLO.out.svs_per_family_merged_tbi           // channel: [ val(meta), path(tbi) ]
@@ -490,6 +495,7 @@ workflow {
     // WORKFLOW: Run main workflow
     //
     GENOMICMEDICINESWEDEN_NALLO(
+        createReferenceChannelFromPath(params.annotsv_annotations, channel.value([[], []])),
         createReferenceChannelFromPath("${projectDir}/assets/cadd_to_vcf_header_-1.0-.txt"),
         createReferenceChannelFromPath(params.cadd_prescored_indels),
         createReferenceChannelFromPath(params.cadd_resources),
@@ -542,6 +548,7 @@ workflow {
         createReferenceChannelFromPath(params.vep_cache, channel.value([[], []])),
         createReferenceChannelFromSamplesheet(params.vep_plugin_files, 'assets/schema_vep_plugin_files.json', channel.value([])),
         params.alignment_processes,
+        params.annotsv_annotations,
         params.assembly_aligner,
         params.bigwig_modcodes,
         params.alignment_output_format == 'cram',
@@ -794,6 +801,7 @@ workflow {
     snvs_sample                    = ch_snvs_sample                                                // channel: [ val(meta), path(vcf/tbi) ]
     somalier_relate                = ch_somalier_relate                                            // channel: [ val(meta), path(html/pairs/samples) ]
     svs_per_family                 = ch_svs_per_family                                             // channel: [ val(meta), path(vcf.gz/tbi) ]
+    annotsv_tsv                    = GENOMICMEDICINESWEDEN_NALLO.out.annotsv_tsv                   // channel: [ val(meta), path(tsv) ]
     svs_per_family_and_caller      = ch_svs_per_family_and_caller                                  // channel: [ val(meta), path(vcf/tbi) ]
     svs_per_family_merged          = ch_svs_per_family_merged                                      // channel: [ val(meta), path(vcf/tbi) ]
     visualization_tracks           = ch_visualization_tracks                                       // channel: [ val(meta), path(bw,combined.bw/hap1.bw/hap2.bw) ]
@@ -946,6 +954,9 @@ output {
     svs_per_family_and_caller {
         path { meta, _file -> "svs/family/${meta.id}/" }
         enabled params.publish_unannotated_family_svs
+    }
+    annotsv_tsv {
+        path { meta, _file -> "svs/family/${meta.id}/" }
     }
     svs_per_family_merged {
         path { meta, _file -> "svs/family/${meta.id}/" }

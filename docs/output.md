@@ -293,10 +293,12 @@ When `--skip_prepare_gens_input` is disabled, the pipeline prepares coverage and
 
 [SVDB](https://github.com/J35P312/SVDB) and [VEP](https://www.ensembl.org/vep) are used to annotate structural variants.
 
-| Path                                                                   | Description                                                |
-| ---------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `svs/family/{family_id}/{family_id}_svs_annotated_research.vcf.gz`     | VCF file with merged and annotated CNVs and SVs per family |
-| `svs/family/{family_id}/{family_id}_svs_annotated_research.vcf.gz.tbi` | Index of the merged VCF file                               |
+| Path                                                                   | Description                                                     |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `svs/family/{family_id}/{family_id}_svs_annotated_research.vcf.gz`     | VCF file with merged and annotated CNVs and SVs per family      |
+| `svs/family/{family_id}/{family_id}_svs_annotated_research.vcf.gz.tbi` | Index of the merged VCF file                                    |
+| `svs/family/{family_id}/{family_id}_annotsv.tsv`                       | AnnotSV report when `--annotsv_annotations` is set              |
+| `svs/family/{family_id}/{family_id}_annotsv.unannotated.tsv`           | Optional AnnotSV report of variants that could not be annotated |
 
 #### Ranking
 

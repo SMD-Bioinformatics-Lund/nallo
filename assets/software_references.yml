@@ -20,6 +20,9 @@ tool:
   addmostseverepli:
     citation: "add_most_severe_pli (Neethiraj 2022)"
     bibliography: ""
+  annotsv:
+    citation: "AnnotSV (Geoffroy et al. 2018)"
+    bibliography: "Geoffroy V, Herenger Y, Kress A, et al. AnnotSV: an integrated tool for structural variations annotation. Bioinformatics. 2018;34(20):3572–3574. doi:10.1093/bioinformatics/bty304"
   bcftools:
     citation: "BCFtools (Danecek et al. 2021)"
     bibliography: "Danecek P, Bonfield JK, Liddle J, et al. Twelve years of SAMtools and BCFtools. GigaScience. 2021;10(2):giab008. doi:10.1093/gigascience/giab008"

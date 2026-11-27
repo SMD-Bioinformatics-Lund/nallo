@@ -226,6 +226,12 @@
                     "pattern": "^\\S+\\.(csv|tsv|json|ya?ml)$",
                     "schema": "assets/svdb_query_vcf_schema.json"
                 },
+                "annotsv_annotations": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "exists": true,
+                    "description": "Path to the installed AnnotSV annotations directory for GRCh38. Providing it enables family-level AnnotSV TSV reports."
+                },
                 "stranger_repeat_catalog": {
                     "type": "string",
                     "description": "A variant catalog json-file for stranger",

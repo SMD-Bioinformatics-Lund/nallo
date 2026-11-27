@@ -48,6 +48,7 @@ Define where the pipeline should find input data and save output data.
 | `str_bed` | A BED file with repeats to be genotyped with TRGT | `string` |  |  |  |
 | `echtvar_snv_databases` | Path to a CSV/TSV/JSON/YAML file with echtvar databases to annotate SNVs with. | `string` |  |  |  |
 | `svdb_sv_databases` | Databases used for structural variant annotation in vcf format. <details><summary>Help</summary><small>Path to a CSV/TSV/JSON/YAML file containing information about the databases used for structural variant annotation.</small></details>| `string` |  |  |  |
+| `annotsv_annotations` | Path to the installed AnnotSV annotations directory for GRCh38. Providing it enables family-level AnnotSV TSV reports. | `string` |  |  |  |
 | `stranger_repeat_catalog` | A variant catalog json-file for stranger | `string` |  |  |  |
 | `variant_consequences_snvs` | File containing list of SO terms listed in the order of severity from most severe to lease severe for annotating genomic SNVs. For more information check https://ensembl.org/info/genome/variation/prediction/predicted_data.html | `string` |  |  |  |
 | `variant_consequences_svs` | File containing list of SO terms listed in the order of severity from most severe to lease severe for annotating genomic SVs. For more information check https://ensembl.org/info/genome/variation/prediction/predicted_data.html | `string` |  |  |  |

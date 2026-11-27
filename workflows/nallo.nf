@@ -91,6 +91,7 @@ RUN MAIN WORKFLOW
 
 workflow NALLO {
     take:
+    ch_annotsv_annotations
     ch_cadd_header
     ch_cadd_prescored_indels
     ch_cadd_resources
@@ -141,6 +142,7 @@ workflow NALLO {
     ch_vep_cache_unprocessed
     ch_vep_plugin_files
     val_alignment_processes
+    val_annotate_annotsv
     val_assembly_aligner
     val_bigwig_modcodes
     val_convert_unphased_aligned_reads_to_cram
@@ -1120,6 +1122,7 @@ workflow NALLO {
     //
     // Annotate SVs
     //
+    ch_annotsv_tsv = channel.empty()
     if (!val_skip_sv_annotation) {
 
         ANNOTATE_SVS(
@@ -1129,7 +1132,10 @@ workflow NALLO {
             PREPARE_REFERENCES.out.vep_resources,
             val_vep_cache_version,
             ch_vep_plugin_files.collect(),
+            val_annotate_annotsv,
+            ch_annotsv_annotations,
         )
+        ch_annotsv_tsv = ANNOTATE_SVS.out.annotsv_tsv
 
         ch_clin_research_svs_vcf = ANNOTATE_SVS.out.vcf.multiMap { meta, vcf ->
             clinical: [meta + [set: "clinical"], vcf]
@@ -1525,6 +1531,7 @@ workflow NALLO {
     snvs_family_joint_vcf               = ch_snvs_family_joint_vcf                                                                                                                         // channel: [ val(meta), path(vcf) ]
     snvs_family_tbi                     = val_skip_snv_calling ? channel.empty() : CONCAT_SORT_RANKED_SNVS.out.index                                                                       // channel: [ val(meta), path(tbi) ]
     snvs_family_vcf                     = val_skip_snv_calling ? channel.empty() : CONCAT_SORT_RANKED_SNVS.out.vcf                                                                         // channel: [ val(meta), path(vcf) ]
+    annotsv_tsv                        = ch_annotsv_tsv                                                                                                                                  // channel: [ val(meta), path(tsv) ]
     svs_per_family_and_caller_tbi       = val_skip_sv_calling ? channel.empty() : MERGE_SVS.out.family_caller_tbi                                                                          // channel: [ val(meta), path(tbi) ]
     svs_per_family_and_caller_vcf       = val_skip_sv_calling ? channel.empty() : MERGE_SVS.out.family_caller_vcf                                                                          // channel: [ val(meta), path(vcf) ]
     svs_per_family_merged_tbi           = ch_svs_per_family_merged_tbi                                                                                                                     // channel: [ val(meta), path(tbi) ]

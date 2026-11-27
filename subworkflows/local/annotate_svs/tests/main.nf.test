@@ -71,6 +71,8 @@ nextflow_workflow {
                 input[5] = channel.of([
                     file(params.pipelines_testdata_base_path + 'reference/vep_plugin_files.csv', checkIfExists: true)
                 ])
+                input[6] = false
+                input[7] = channel.value([[:], []])
                 """
             }
         }
@@ -109,6 +111,8 @@ nextflow_workflow {
                 input[5] = channel.of([
                     file(params.pipelines_testdata_base_path + 'reference/vep_plugin_files.csv', checkIfExists: true)
                 ])
+                input[6] = false
+                input[7] = channel.value([[:], []])
                 """
             }
         }
@@ -149,6 +153,8 @@ nextflow_workflow {
                 input[5] = channel.of([
                     file(params.pipelines_testdata_base_path + 'reference/vep_plugin_files.csv', checkIfExists: true)
                 ])
+                input[6] = false
+                input[7] = channel.value([[:], []])
                 """
             }
         }
@@ -183,6 +189,8 @@ nextflow_workflow {
                 input[5] = channel.of([
                     file(params.pipelines_testdata_base_path + 'reference/vep_plugin_files.csv', checkIfExists: true)
                 ])
+                input[6] = false
+                input[7] = channel.value([[:], []])
                 """
             }
         }
@@ -191,6 +199,45 @@ nextflow_workflow {
             assertAll(
                 { assert workflow.success },
                 { assert snapshot(workflow.out).match() }
+            )
+        }
+
+    }
+
+    test("Stub AnnotSV reports with annotations configured") {
+
+        tag "annotate_svs"
+        options "-stub"
+
+        when {
+            workflow {
+                """
+                input[0] = SEVERUS.out.all_vcf
+                input[1] = GUNZIP.out.gunzip
+                input[2] = channel.of([
+                    'https://github.com/genomic-medicine-sweden/test-datasets/raw/b9ff54b59cdd39df5b6e278a30b08d94075a644c/reference/colorsdb.test_data.vcf.gz',
+                    'AF',
+                    'AC',
+                    'colorsdb_af',
+                    'colorsdb_ac'
+                ])
+                input[3] = UNTAR.out.untar
+                input[4] = channel.value(params.vep_cache_version as String)
+                input[5] = channel.of([
+                    file(params.pipelines_testdata_base_path + 'reference/vep_plugin_files.csv', checkIfExists: true)
+                ])
+                input[6] = true
+                input[7] = channel.value([[id: 'test_annotations'], file(projectDir)])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.vcf.size() == 1 },
+                { assert workflow.out.tbi.size() == 1 },
+                { assert workflow.out.annotsv_tsv.collect { meta, tsv -> file(tsv).name }.sort() == ['test.tsv', 'test.unannotated.tsv'] }
             )
         }
 

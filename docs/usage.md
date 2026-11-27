@@ -490,6 +490,8 @@ The following additional files are required:
 | `extra_vep_options_sv`           | **Optional**: Options appended to the VEP core command for SV annotation. Defaults to standard enrichment annotations. To add plugins, supply the default flags plus your additions (e.g. `'--appris --biotype ... --plugin CADD,sv.tsv.gz'`). Plugin files must be included in `vep_plugin_files`.                                                |
 | `variant_consequences_svs`       | A list of SO terms listed in the order of severity from most severe to lease severe for annotating SVs. Sample file [here](https://github.com/nf-core/test-datasets/blob/raredisease/reference/variant_consequences_v2.txt). You can learn more about these terms [here](https://ensembl.org/info/genome/variation/prediction/predicted_data.html) |
 
+To add AnnotSV reports, pass `--annotsv_annotations /path/to/Annotations` with the directory containing the installed [AnnotSV human annotations](https://github.com/lgmgeo/AnnotSV#quick-installation) for GRCh38. AnnotSV runs on each family's VEP-annotated SV VCF before clinical filtering and ranking, and writes separate TSV reports. It is disabled when the option is omitted or `--skip_sv_annotation` is set.
+
 The SVDB matching settings used when annotating against the databases are set with the parameters below.
 
 | Parameter                       | Description                                                                                   | Default |
