@@ -1,0 +1,47 @@
+Changes in component 'nf-core/annotsv/annotsv'
+Changes in 'annotsv/annotsv/main.nf':
+--- modules/nf-core/annotsv/annotsv/main.nf
++++ modules/nf-core/annotsv/annotsv/main.nf
+@@ -9,9 +9,6 @@
+     container "${workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container
+         ? 'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/66/664c800960f1b08bcae320959b20db6b606f3c5de2488d63376eed58f32b1a10/data'
+         : 'community.wave.seqera.io/library/annotsv:3.5.10--28ac84a07bcbf122'}"
+-
+-    // Container options are needed to allow AnnotSV to overwrite a file in a dependency directory in Singularity
+-    containerOptions "${ workflow.containerEngine in ['singularity', 'apptainer'] ? '--writable-tmpfs' : ''}"
+ 
+     input:
+     tuple val(meta), path(sv_vcf), path(sv_vcf_index), path(candidate_small_variants)
+@@ -38,7 +35,24 @@
+     def fp_snv         = false_positive_snv       ? "-snvIndelFiles ${false_positive_snv}"                : ""
+     def transcripts    = gene_transcripts         ? "-txFile ${gene_transcripts}"                         : ""
+ 
++    def use_local_variantconvert = (args =~ /(?:^|\s)-vcf\s+1(?:\s|$)/).find() && !args.tokenize().contains('-variantconvertDir')
++    // AnnotSV rewrites variantconvert's config files when it generates a VCF.
++    def prepare_variantconvert = use_local_variantconvert ? '''
++    annotsv_executable=$(readlink -f "$(command -v AnnotSV)")
++    annotsv_install_dir=$(dirname "$(dirname "$annotsv_executable")")
++    variantconvert_dir=$(mktemp -d "$PWD/variantconvert.XXXXXX")
++    cp -RL "$annotsv_install_dir/share/python3/variantconvert/src" "$variantconvert_dir/"
++    chmod -R u+rwX "$variantconvert_dir/src"
++
++    python3 "$variantconvert_dir/src/variantconvert" --version
++    # The bundled converter is already installed. Keep AnnotSV from running pip in the task.
++    echo 'Successfully installed variantconvert' > "$variantconvert_dir/pipinstall.flag"
++    ''' : ''
++    def variantconvert_args = use_local_variantconvert ? '-variantconvertDir "$variantconvert_dir"' : ''
++
+     """
++    ${prepare_variantconvert}
++
+     AnnotSV \\
+         -annotationsDir ${annotations} \\
+         ${cand_genes} \\
+@@ -47,6 +61,7 @@
+         ${transcripts} \\
+         -outputFile ${prefix}.tsv \\
+         -SVinputFile ${sv_vcf} \\
++        ${variantconvert_args} \\
+         ${args}
+ 
+     # AnnotSV exits 0 without an output directory when the VCF has no records
